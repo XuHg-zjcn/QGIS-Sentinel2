@@ -15,7 +15,7 @@ def name_to_pydt(name):
 #TODO: set gamma
 def update_band_rgb(S2imgs, 
                     band_Red, band_Green, band_Blue,
-                    percent_min=0.02, percent_max=0.99):
+                    percent_min=0.02, percent_max=0.99, gamma=1.5):
     for img in S2imgs:
         layer = img.layer()
         rend = layer.renderer()
@@ -31,6 +31,8 @@ def update_band_rgb(S2imgs,
             myEnhancement.setMaximumValue(stats[1])
             myEnhancement.setContrastEnhancementAlgorithm(contrast_enhancement,True)
             getattr(rend,'set'+vis+'ContrastEnhancement')(myEnhancement)
+        brightness = layer.brightnessFilter()
+        brightness.setGamma(gamma)
         layer.triggerRepaint()
 
 def setting_temporal(S2imgs):
@@ -73,5 +75,5 @@ root = QgsProject.instance().layerTreeRoot()
 S2 = root.findGroup("Sentinel2")   # group name in QGIS project
 update_from_directory('/mnt/3tsas/rs/uncompress/Sentinel2', S2)  # change to your directory to `batch.sh` output dir
 S2imgs = S2.children()
-update_band_rgb(S2imgs, 12, 8, 2)
+update_band_rgb(S2imgs, 12, 8, 2, percent_max=0.998)
 setting_temporal(S2imgs)
